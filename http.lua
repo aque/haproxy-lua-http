@@ -681,7 +681,12 @@ function M.send(method, t)
 
         if not t.headers.host then
             -- 'Host' header must be provided for HTTP/1.1
-            table.insert(hdr_tbl, "host: " .. host)
+            if addr:find(":") and not addr:match("^%[.*%]$") then
+                -- Enclose IPv6 addresses in square brackets
+                table.insert(hdr_tbl, string.format("host: [%s]:%s", addr, port))
+            else
+                table.insert(hdr_tbl, "host: " .. host)
+            end
         end
 
         if not t.headers["accept"] then
